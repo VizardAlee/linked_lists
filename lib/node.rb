@@ -1,11 +1,11 @@
-#frozen_string_literal: true
+# frozen_string_literal: true
 
-# Node
+# node class
 class Node
-  attr_accessor :data, :next
+  attr_accessor :value, :next_node
 
-  def initialize(data, next_node)
-    @data = data
-    @next = next_node
+  def initialize(value = nil, next_node = nil)
+    @value = value
+    @next_node = next_node
   end
 end

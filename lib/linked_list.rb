@@ -1,115 +1,91 @@
-# frozen_string_literal: true
+# forzen_string_literal: true
 
 require_relative 'node'
+
+# linked list class
 class LinkedList
-  attr_reader :head, :tail
+  attr_accessor :head
 
   def initialize
     @head = nil
-    @tail = nil
   end
 
-  def appends(value)
-    if @head
-      tail.next = Node.new(value, nil)
+  def append(value)
+    if @head.nil?
+      @head = Node.new(value)
     else
-      @head = Node.new(value, nil)
+      tail.next_node = Node.new(value)
     end
   end
 
-  def head_display
-    @head.data
+  def list_prepend(value)
+    if @head.nil?
+      @head = Node.new(value)
+    else
+      @head = Node.new(value, @head)
+    end
   end
 
-  def tail_display
-    tail.data
+  def size(node = @head, count = 0)
+    return "#{count} total Nodes" if node.nil?
+
+    size(node.next_node, count + 1)
   end
 
   def tail
-    current_node = @head
+    node = @head
 
-    return current_node if !current_node.next
-    return current_node if !current_node.next while(current_node = current_node.next)
+    return node unless node.next_node
+
+    return node unless node.next_node while (node = node.next_node)
   end
 
-  def prepends(value)
-    new_node = Node.new(value, @head)
-    @head = new_node
+  def at(index, count = 0, node = @head)
+    return "Index #{index} not in scope" if node.nil?
+    return node.value if count == index
+
+    at(index, count + 1, node.next_node)
   end
 
-  def size
-    current_node = @head
-    return 0 if @head.nil?
+  def list_pop(node = @head)
+    return node.next_node = nil if node.next_node.next_node.nil?
 
-    count = 1
-    until current_node.next.nil?
-      count += 1
-      current_node = current_node.next
-    end
-    count
+    list_pop(node.next_node)
   end
 
-  def at(index = 0)
-    return 'Please input a value!' if index < 1
+  def contains?(value, node = @head)
+    return false if node.nil?
+    return true if node.value == value
 
-    current_node = @head
-    humanize = index - 1
-    humanize.times do
-      return 'Warning!!! Exceeded list length' if current_node.next.nil?
-
-      current_node = current_node.next
-    end
-    current_node.data
+    contains?(value, node.next_node)
   end
 
-  def pop_list
-    return 'The list is currently empty' if @head.nil?
+  def find(value, node = @head, count = 0)
+    return "It's either #{value} doesn't exist or the word case doesn't match" if node.nil?
+    return "Located at index #{count}" if node.value == value
 
-    current_node = @head
-    current_node = current_node.next until current_node.next.next.nil?
-
-    last_node = current_node.next
-    current_node.next = nil
-    last_node
+    find(value, node.next_node, count + 1)
   end
 
-  def contains?(value, current_node = @head)
-    return true if current_node.data == value
-    return false if current_node.next.nil?
+  def to_s(node = @head, string = '')
+    return "#{string} nil" if node.nil?
 
-    contains?(value, current_node.next)
+    string << "( #{node.value} ) ->"
+    to_s(node.next_node, string)
   end
 
-  def find(value, current_node = @head, count = 0)
-    return "In index #{count + 1}" if current_node.data == value
-    return 'No such data here' if current_node.next.nil?
+  def insert_at(value, index, count = 0, node = @head)
+    return node.next_node = Node.new(value, node.next_node) if count == index - 1
+    return node = Node.new(value) if node.nil?
 
-    find(value, current_node.next, count += 1)
+    insert_at(value, index, count + 1, node.next_node)
   end
 
-  def to_s
-    current_node = @head
-    until current_node.next.nil?
-      current_node = current_node.next
-      print " ( #{current_node.data} ) -> "
-    end
-    print "nil"
+  def remove_at(index, count = 0, node = @head)
+    return node if node.nil?
+
+    node.next_node = node.next_node.next_node if count == index - 1
+
+    remove_at(index, count + 1, node.next_node)
   end
 end
-
-list = LinkedList.new
-list.appends('Salaam!')
-list.appends('I pray for wealth')
-list.prepends('Bismillah')
-list.appends('I pray for love')
-list.head_display
-list.tail_display
-list.size
-list.at(4)
-list.pop_list
-list.pop_list
-
-list.prepends('Ya Allah!')
-p list.contains?('Bismillah')
-p list.find('Bismillah')
-list.to_s
